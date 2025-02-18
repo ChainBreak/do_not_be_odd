@@ -7,19 +7,7 @@ from loguru import logger
 
 app = FastAPI()
 
-@dataclasses.dataclass
 
-class User():
-    id: str
-    name: str
-
-    def create_new_user():
-        return User(
-            id=str( uuid.uuid4() ),
-            name="New User",
-        )
-
-users = defaultdict(User.create_new_user)
 
 
 def get_user(request: Request, response: Response):
