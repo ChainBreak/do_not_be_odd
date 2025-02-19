@@ -1,16 +1,19 @@
 from collections import defaultdict
 import dataclasses
+import multiprocessing
 import random
+import threading
 import uuid
 from loguru import logger
+import traceback
 
 class Model():
 
     def __init__(self):
+        traceback.print_stack()
         logger.info("Creating new model")
         self.users = defaultdict(self.create_new_user)
         self.active_games = {}
-        self.test_dict = dict()
 
     def get_user(self, user_id):
         return self.users[user_id]
@@ -29,11 +32,11 @@ class Model():
         )
 
         self.active_games[game_id] = game
-        self.test_dict.update( {game_id:"hi"})
-
         logger.info(f"Created new game with id {game_id}")
-        logger.info(f"Games: {self.active_games}")
-        logger.info(f"test: {self.test_dict}")
+        logger.info(f"{self}")
+        logger.info(f"Process name: {multiprocessing.current_process().name}")
+        logger.info(f"Thread name: {threading.current_thread().name}")
+    
         return game
     
     def get_unique_game_id(self):

@@ -1,3 +1,5 @@
+import multiprocessing
+import threading
 from typing import Optional
 import fastapi
 from loguru import logger
@@ -21,7 +23,7 @@ async def root(
 
 @app.get("/new_game")
 def new_game(
-    model = deps.get_model(),
+    model = Depends(deps.get_model),
     ):
     
     game = model.create_new_game()
@@ -37,12 +39,13 @@ async def play(
     ):
 
     logger.info(f"{model=}")
-    logger.info(f"Games: {model.active_games=}")
-    # game = model.games[game_id]
+    game = model.active_games[game_id]
+    logger.info(f"Process name: {multiprocessing.current_process().name}")
+    logger.info(f"Thread name: {threading.current_thread().name}")
 
     return templates.TemplateResponse("play.html", {
         "request": request,
-        "game_id": "FAIL",})
+        "game_id": game.id,})
 
 
 @app.get("/update_user")
