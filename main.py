@@ -1,47 +1,55 @@
 from typing import Optional
-import uuid
-from collections import defaultdict
-import dataclasses
-from fastapi import FastAPI, Request, Response, Depends
+import fastapi
 from loguru import logger
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import HTMLResponse, RedirectResponse
+from fastapi.templating import Jinja2Templates
+from fastapi import Request, Depends
+import dependencies.dependencies as deps
+from model import model
 
-app = FastAPI()
+app = fastapi.FastAPI()
 
+app.mount("/static", StaticFiles(directory="static"), name="static")
+templates = Jinja2Templates(directory="templates")
 
+@app.get("/", response_class=HTMLResponse)
+async def root(
+    request:Request,
+    ):
+    return templates.TemplateResponse("index.html", {"request": request})
 
+@app.get("/new_game")
+def new_game(
+    model = deps.get_model(),
+    ):
+    
+    game = model.create_new_game()
 
-def get_user(request: Request, response: Response):
-    """Dependency that adds a unqiue user_id to the cookie in the response if it does not exist"""
+    return RedirectResponse(url=f"/play/{game.id}")
 
-    user_id = request.cookies.get("user_id", None)
-
-    user = users[user_id]
-
-    response.set_cookie(key="user_id", value=user.id)
-
-    return user
-
-
-@app.get("/")
-async def root():
-    return {"message": "Hello World"}
-
-
-@app.get("/play/{game_id}")
-async def game(
+@app.get("/play/{game_id}", response_class=HTMLResponse)
+async def play(
+    request: Request,
     game_id: str,
-    user: str = Depends(get_user),
+    user: str = Depends(deps.get_user),
+    model: model.Model = Depends(deps.get_model),
     ):
 
-    logger.debug(users)
-    return {"game_id": game_id, "user": user}
+    logger.info(f"{model=}")
+    logger.info(f"Games: {model.active_games=}")
+    # game = model.games[game_id]
+
+    return templates.TemplateResponse("play.html", {
+        "request": request,
+        "game_id": "FAIL",})
 
 
 @app.get("/update_user")
 async def update_user(
     key:str,
     value:str,
-    user: str = Depends(get_user),
+    user: str = Depends(deps.get_user),
     ):
 
     user.__setattr__(key, value)

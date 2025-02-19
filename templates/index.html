@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome</title>
+</head>
+<body>
+    <h1>Don't Be Odd</h1>
+    <p>This is a basic welcome page.</p>
+
+    <form action="/new_game" method="get">
+        <button type="submit">Start New Game</button>
+    </form>
+
+
+    <input type="text" id="gameId" placeholder="Enter game Id">
+    <button onclick="goToGame()">Join Game</button>
+
+    <script>
+        function goToGame() {
+            var game_id = document.getElementById('gameId').value;
+            window.location.href = "play/" + game_id;
+        }
+    </script>
+</body>
+</html></html>
