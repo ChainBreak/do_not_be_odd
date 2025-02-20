@@ -1,28 +1,29 @@
 from collections import defaultdict
 import dataclasses
-import multiprocessing
 import random
-import threading
 import uuid
 from loguru import logger
-import traceback
 
 class Model():
 
     def __init__(self):
-        traceback.print_stack()
+
         logger.info("Creating new model")
         self.users = defaultdict(self.create_new_user)
-        self.active_games = {}
+        self.games = {}
 
     def get_user(self, user_id):
         return self.users[user_id]
     
     def create_new_user(self):
-        return User(
+
+        user = User(
             id=str( uuid.uuid4() ),
             name="New User",
         )
+
+        logger.info(f"Created new user with id {user.id}")
+        return user
 
     def create_new_game(self) -> "Game":
         game_id = self.get_unique_game_id()
@@ -31,11 +32,8 @@ class Model():
             id=game_id,
         )
 
-        self.active_games[game_id] = game
+        self.games[game_id] = game
         logger.info(f"Created new game with id {game_id}")
-        logger.info(f"{self}")
-        logger.info(f"Process name: {multiprocessing.current_process().name}")
-        logger.info(f"Thread name: {threading.current_thread().name}")
     
         return game
     
@@ -43,7 +41,7 @@ class Model():
         # max retries to avoid infinite loop
         for _ in range(100):
             game_id = ''.join(random.choices('ABCDEFGHIJKLMNOPQRSTUVWXYZ123456789', k=4))
-            if game_id not in self.active_games:
+            if game_id not in self.games:
                 return game_id
             
         raise ValueError("Could not generate a unique game id")

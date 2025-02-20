@@ -1,6 +1,7 @@
 
 
 import fastapi
+from loguru import logger
 from model import model
 import functools
 
@@ -20,6 +21,9 @@ def get_user(
 
     user = model.get_user(user_id)
 
-    response.set_cookie(key="user_id", value=user.id)
+    response.set_cookie(
+        key="user_id", 
+        value=user.id,
+        )
 
     return user

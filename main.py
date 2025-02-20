@@ -6,9 +6,10 @@ from loguru import logger
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
-from fastapi import Request, Depends
+from fastapi import Request, Depends, Response
 import dependencies.dependencies as deps
 from model import model
+from fastapi import WebSocket
 
 app = fastapi.FastAPI()
 
@@ -18,12 +19,22 @@ templates = Jinja2Templates(directory="templates")
 @app.get("/", response_class=HTMLResponse)
 async def root(
     request:Request,
+    response: Response,
+    user: str = Depends(deps.get_user),
     ):
-    return templates.TemplateResponse("index.html", {"request": request})
+
+    return templates.TemplateResponse(
+        name="index.html",
+        context={
+            "request": request,
+        }, 
+        response=response,
+        )
 
 @app.get("/new_game")
 def new_game(
     model = Depends(deps.get_model),
+    user: str = Depends(deps.get_user),
     ):
     
     game = model.create_new_game()
@@ -33,19 +44,41 @@ def new_game(
 @app.get("/play/{game_id}", response_class=HTMLResponse)
 async def play(
     request: Request,
+    response: Response,
     game_id: str,
     user: str = Depends(deps.get_user),
     model: model.Model = Depends(deps.get_model),
     ):
 
-    logger.info(f"{model=}")
-    game = model.active_games[game_id]
-    logger.info(f"Process name: {multiprocessing.current_process().name}")
-    logger.info(f"Thread name: {threading.current_thread().name}")
+    game = model.games[game_id]
 
-    return templates.TemplateResponse("play.html", {
-        "request": request,
-        "game_id": game.id,})
+    return templates.TemplateResponse(
+        name="play.html", 
+        context={
+            "request": request,
+            "game_id": game.id,
+        },
+        response=response,
+        )
+
+
+@app.websocket("/websocket/{game_id}")
+async def websocket_endpoint(
+    game_id: str,
+    websocket: WebSocket, 
+    ):
+    logger.info(f"WebSocket connection initiated for game {game_id}")
+    await websocket.accept()
+    cookies = websocket.cookies
+    logger.info(f"Cookies received: {cookies.get('user_id')}")
+    try:
+        while True:
+            data = await websocket.receive_text()
+            await websocket.send_text(f"Message text was: {data}")
+    except Exception as e:
+        logger.error(f"WebSocket connection closed with exception: {e}")
+    finally:
+        await websocket.close()
 
 
 @app.get("/update_user")

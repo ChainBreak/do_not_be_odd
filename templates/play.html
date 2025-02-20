@@ -10,4 +10,32 @@
     <h2>Playing Game: {{ game_id }}</h2>
     <p>Enjoy playing</p>
 </body>
+
+<script>
+    
+    const socket = new WebSocket('/websocket/{{game_id}}');
+
+    socket.onopen = function(event) {
+        console.log('WebSocket is open now.');
+    };
+
+    socket.onmessage = function(event) {
+        console.log('WebSocket message received:', event.data);
+    };
+
+    socket.onclose = function(event) {
+        console.log('WebSocket is closed now.');
+    };
+
+    socket.onerror = function(error) {
+        console.error('WebSocket error observed:', error);
+    };
+
+    setInterval(function() {
+        if (socket.readyState === WebSocket.OPEN) {
+            socket.send('Hello, WebSocket!');
+        }
+    }, 5000); // Send a message every 5 seconds
+</script>
+
 </html></html>
