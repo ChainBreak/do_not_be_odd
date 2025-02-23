@@ -7,7 +7,9 @@ import functools
 
 
 @functools.lru_cache()
-def get_model():
+def get_model() -> model.Model:
+    """Dependency that returns a new model instance"""
+    logger.info("Creating new model")
     return model.Model()
 
 def get_user(
