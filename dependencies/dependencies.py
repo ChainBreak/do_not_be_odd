@@ -2,20 +2,20 @@
 
 import fastapi
 from loguru import logger
-from model import model
+from models import models
 import functools
 
 
 @functools.lru_cache()
-def get_model() -> model.Model:
+def get_model() -> models.Model:
     """Dependency that returns a new model instance"""
     logger.info("Creating new model")
-    return model.Model()
+    return models.Model()
 
 def get_user(
         request: fastapi.Request, 
         response: fastapi.Response,
-        model: model.Model = fastapi.Depends(get_model),
+        model: models.Model = fastapi.Depends(get_model),
     ):
     """Dependency that adds a unqiue user_id to the cookie in the response if it does not exist"""
 

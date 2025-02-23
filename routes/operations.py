@@ -3,7 +3,7 @@ from loguru import logger
 from fastapi.responses import RedirectResponse
 from fastapi import APIRouter, Request, Depends, Response
 
-from model import model
+from models import models
 from fastapi import WebSocket
 
 import dependencies.dependencies as deps
@@ -13,7 +13,7 @@ router = APIRouter()
 
 @router.get("/new_game")
 def new_game(
-    model: model.Model = Depends(deps.get_model),
+    model: models.Model = Depends(deps.get_model),
     ):
     
     game = model.create_new_game()

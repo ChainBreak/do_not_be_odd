@@ -6,7 +6,7 @@ from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
 from fastapi import APIRouter, Request, Depends, Response
 
-from model import model
+from models import models
 from fastapi import WebSocket
 
 router = APIRouter()
