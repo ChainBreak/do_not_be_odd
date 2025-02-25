@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, Request, Response
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
-from models import models
+from models import model
 
 
 import dependencies.dependencies as deps
@@ -19,8 +19,8 @@ async def root(
         name="index.html",
         context={
             "request": request,
+            "response":response,
         },
-        response=response,
     )
 
 @router.get("/play/{game_id}", response_class=HTMLResponse)
@@ -29,7 +29,7 @@ async def play(
     response: Response,
     game_id: str,
     user: str = Depends(deps.get_user),
-    model: models.Model = Depends(deps.get_model),
+    model: model.Model = Depends(deps.get_model),
     ):
 
     game = model.games[game_id]
@@ -38,7 +38,7 @@ async def play(
         name="play.html", 
         context={
             "request": request,
+            "response":response,
             "game_id": game.id,
         },
-        response=response,
         )

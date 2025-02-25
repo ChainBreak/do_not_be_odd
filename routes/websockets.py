@@ -6,7 +6,7 @@ from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
 from fastapi import APIRouter, Request, Depends, Response
 
-from models import models
+from models import model
 from fastapi import WebSocket
 
 router = APIRouter()
@@ -27,4 +27,8 @@ async def websocket_endpoint(
     except Exception as e:
         logger.error(f"WebSocket connection closed with exception: {e}")
     finally:
-        await websocket.close()
+        try:
+            await websocket.close()
+        except RuntimeError as e:
+            pass
+        

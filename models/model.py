@@ -3,6 +3,8 @@ import dataclasses
 import random
 import uuid
 from loguru import logger
+from models.game import Game
+from models.user import User
 
 class Model():
 
@@ -46,12 +48,6 @@ class Model():
             
         raise ValueError("Could not generate a unique game id")
 
-@dataclasses.dataclass
-class Game():
-    id: str
-    players: list["User"] = dataclasses.field(default_factory=list)
 
-@dataclasses.dataclass
-class User():
-    id: str
-    name: str
+
+

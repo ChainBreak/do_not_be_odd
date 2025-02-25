@@ -3,23 +3,21 @@ from loguru import logger
 from fastapi.responses import RedirectResponse
 from fastapi import APIRouter, Request, Depends, Response
 
-from models import models
+from models import model
 from fastapi import WebSocket
 
 import dependencies.dependencies as deps
 
 router = APIRouter()
 
-
 @router.get("/new_game")
 def new_game(
-    model: models.Model = Depends(deps.get_model),
+    model: model.Model = Depends(deps.get_model),
     ):
     
     game = model.create_new_game()
 
     return RedirectResponse(url=f"/play/{game.id}")
-
 
 @router.get("/update_user")
 async def update_user(
