@@ -1,6 +1,7 @@
 
 
 import fastapi
+from fastapi.responses import RedirectResponse
 from loguru import logger
 from models import model
 import functools
@@ -14,18 +15,12 @@ def get_model() -> model.Model:
 
 def get_user(
         request: fastapi.Request, 
-        response: fastapi.Response,
         model: model.Model = fastapi.Depends(get_model),
     ):
-    """Dependency that adds a unqiue user_id to the cookie in the response if it does not exist"""
+    """Dependency that returns the user from the cookie"""
+    cookie_user_id = request.cookies.get("user_id",None)
+    state_user_id = request.state.user_id 
+    
+    logger.debug(f"Cookie user id: {cookie_user_id}. State user id: {state_user_id}")
 
-    user_id = request.cookies.get("user_id", None)
-
-    user = model.get_user(user_id)
-
-    response.set_cookie(
-        key="user_id", 
-        value=user.id,
-        )
-
-    return user
+    return model.users[state_user_id]

@@ -11,23 +11,23 @@ class Model():
     def __init__(self):
 
         logger.info("Creating new model")
-        self.users = defaultdict(self.create_new_user)
+        self.users = {}
         self.games = {}
-
-    def get_user(self, user_id):
-        return self.users[user_id]
     
-    def create_new_user(self):
+    def add_new_user(self):
 
         user = User(
             id=str( uuid.uuid4() ),
             name="New User",
         )
 
+        self.users[user.id] = user
+
         logger.info(f"Created new user with id {user.id}")
         return user
 
     def create_new_game(self) -> "Game":
+        
         game_id = self.get_unique_game_id()
         
         game = Game(
