@@ -21,3 +21,10 @@ def session_dependency(
     state_session_id = request.state.session_id 
     
     return model.sessions[state_session_id]
+
+def game_dependency(
+        game_id: str,
+        model: model.Model = fastapi.Depends(model_dependency),
+    ):
+    """Dependency that returns the game from the game_id"""
+    return model.games[game_id]

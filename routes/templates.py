@@ -27,8 +27,9 @@ async def play(
     game_id: str,
     session: str = Depends(deps.session_dependency),
     model: model.Model = Depends(deps.model_dependency),
+    game: model.Game = Depends(deps.game_dependency),
     ):
-    game = model.games[game_id]
+    # game = model.games[game_id]
 
     return templates.TemplateResponse(
         name="play.html", 
