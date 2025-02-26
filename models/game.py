@@ -1,8 +1,8 @@
 import dataclasses
 
-from models.user import User
+from models.session import Session
 
 @dataclasses.dataclass
 class Game():
     id: str
-    players: list["User"] = dataclasses.field(default_factory=list)
+    players: list["Session"] = dataclasses.field(default_factory=list)

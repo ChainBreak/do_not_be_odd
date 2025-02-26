@@ -12,11 +12,11 @@ router = APIRouter()
 @router.get("/", response_class=HTMLResponse)
 async def root(
     request: Request,
-    user: str = Depends(deps.get_user),
+    session: str = Depends(deps.session_dependency),
     ):
     response = templates.TemplateResponse(
         name="index.html",
-        context={"request": request, "user_id":user.id},
+        context={"request": request, "session_id":session.id},
     )
 
     return response
@@ -25,8 +25,8 @@ async def root(
 async def play(
     request: Request,
     game_id: str,
-    user: str = Depends(deps.get_user),
-    model: model.Model = Depends(deps.get_model),
+    session: str = Depends(deps.session_dependency),
+    model: model.Model = Depends(deps.model_dependency),
     ):
     game = model.games[game_id]
 
@@ -35,6 +35,6 @@ async def play(
         context={
             "request": request,
             "game_id": game.id,
-            "user_id":user.id
+            "session_id":session.id
         },
         )

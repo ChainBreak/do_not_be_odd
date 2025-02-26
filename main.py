@@ -15,22 +15,22 @@ app.include_router(routes.websockets.router)
 app.include_router(routes.operations.router)
 
 @app.middleware("http")
-async def add_user_id_cookie(request: Request, call_next):
+async def add_session_id_cookie(request: Request, call_next):
 
-    model = deps.get_model()
+    model = deps.model_dependency()
 
-    user_id = request.cookies.get("user_id", None)
+    session_id = request.cookies.get("session_id", None)
     
-    if user_id not in model.users:
-        user = model.add_new_user()
-        user_id = user.id
+    if session_id not in model.sessions:
+        session = model.add_new_session()
+        session_id = session.id
 
-    request.state.user_id = user_id
+    request.state.session_id = session_id
 
     # Get the response
     response: Response = await call_next(request)
 
-    # Add our user_id cookie to the response
-    response.set_cookie("user_id", user_id)
+    # Add our session_id cookie to the response
+    response.set_cookie("session_id", session_id)
 
     return response

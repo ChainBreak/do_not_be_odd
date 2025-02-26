@@ -1,6 +1,5 @@
 import dataclasses
 
 @dataclasses.dataclass
-class User():
+class Session():
     id: str
-    name: str

@@ -12,7 +12,7 @@ router = APIRouter()
 
 @router.get("/new_game")
 def new_game(
-    model: model.Model = Depends(deps.get_model),
+    model: model.Model = Depends(deps.model_dependency),
     ):
     
     game = model.create_new_game()
@@ -23,7 +23,7 @@ def new_game(
 async def update_user(
     key:str,
     value:str,
-    user: str = Depends(deps.get_user),
+    user: str = Depends(deps.session_dependency),
     ):
 
     user.__setattr__(key, value)

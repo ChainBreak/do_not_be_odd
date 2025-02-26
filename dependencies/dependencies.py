@@ -8,19 +8,16 @@ import functools
 
 
 @functools.lru_cache()
-def get_model() -> model.Model:
+def model_dependency() -> model.Model:
     """Dependency that returns a new model instance"""
     logger.info("Creating new model")
     return model.Model()
 
-def get_user(
+def session_dependency(
         request: fastapi.Request, 
-        model: model.Model = fastapi.Depends(get_model),
+        model: model.Model = fastapi.Depends(model_dependency),
     ):
     """Dependency that returns the user from the cookie"""
-    cookie_user_id = request.cookies.get("user_id",None)
-    state_user_id = request.state.user_id 
+    state_session_id = request.state.session_id 
     
-    logger.debug(f"Cookie user id: {cookie_user_id}. State user id: {state_user_id}")
-
-    return model.users[state_user_id]
+    return model.sessions[state_session_id]
