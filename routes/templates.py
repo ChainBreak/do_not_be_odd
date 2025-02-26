@@ -1,7 +1,8 @@
 from fastapi import APIRouter, Depends, Request, Response
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
-from models import model
+from models import model, game
+
 
 
 import dependencies.dependencies as deps
@@ -28,14 +29,16 @@ async def play(
     session: str = Depends(deps.session_dependency),
     model: model.Model = Depends(deps.model_dependency),
     game: model.Game = Depends(deps.game_dependency),
+    player: game.Player = Depends(deps.player_dependency),
     ):
-    # game = model.games[game_id]
+    
 
     return templates.TemplateResponse(
         name="play.html", 
         context={
             "request": request,
             "game_id": game.id,
-            "session_id":session.id
+            "session_id":session.id,
+            "player": str(player),
         },
         )

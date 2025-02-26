@@ -19,7 +19,7 @@ async def websocket_endpoint(
     logger.info(f"WebSocket connection initiated for game {game_id}")
     await websocket.accept()
     cookies = websocket.cookies
-    logger.info(f"Cookies received: {cookies.get('user_id')}")
+    logger.info(f"Cookies received: {cookies.get('session_id')}")
     try:
         while True:
             data = await websocket.receive_text()

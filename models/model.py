@@ -30,7 +30,7 @@ class Model():
         game_id = self.get_unique_game_id()
         
         game = Game(
-            id=game_id,
+            game_id=game_id,
         )
 
         self.games[game_id] = game
