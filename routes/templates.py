@@ -22,23 +22,30 @@ async def root(
 
     return response
 
-@router.get("/play/{game_id}", response_class=HTMLResponse)
+@router.get("/game/{game_id}", response_class=HTMLResponse)
 async def play(
     request: Request,
     game_id: str,
     session: str = Depends(deps.session_dependency),
-    model: model.Model = Depends(deps.model_dependency),
     game: model.Game = Depends(deps.game_dependency),
     player: game.Player = Depends(deps.player_dependency),
     ):
     
+    if game is None:
+        return templates.TemplateResponse(
+            name="game_does_not_exist.html", 
+            context={
+                "request": request,
+                "game_id": game_id,
+            },
+        )
 
     return templates.TemplateResponse(
-        name="play.html", 
+        name="game.html", 
         context={
             "request": request,
             "game_id": game.id,
             "session_id":session.id,
             "player": str(player),
         },
-        )
+    )

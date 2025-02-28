@@ -2,8 +2,9 @@ from typing import Optional
 from loguru import logger
 from fastapi.responses import RedirectResponse
 from fastapi import APIRouter, Request, Depends, Response
+from pydantic import BaseModel
 
-from models import model
+from models import model, game
 from fastapi import WebSocket
 
 import dependencies.dependencies as deps
@@ -17,7 +18,7 @@ def new_game(
     
     game = model.create_new_game()
 
-    return RedirectResponse(url=f"/play/{game.id}")
+    return RedirectResponse(url=f"/game/{game.id}")
 
 @router.get("/update_user")
 async def update_user(
@@ -34,3 +35,16 @@ async def update_user(
 @router.get("/items/{item_id}")
 def read_item(item_id: int, q: Optional[str] = None):
     return {"item_id": item_id, "q": q}
+
+class UpdatePlayerNameSchema(BaseModel):
+    name: str
+
+@router.post("/game/{game_id}/update_player_name")
+async def update_player_name(
+    data: UpdatePlayerNameSchema,
+    player: game.Player = Depends(deps.player_dependency),
+    ):
+
+    player.name = data.name
+
+    return {"message": "Player name updated"}

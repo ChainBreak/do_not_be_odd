@@ -27,13 +27,16 @@ def game_dependency(
         model: model.Model = fastapi.Depends(model_dependency),
     ):
     """Dependency that returns the game from the game_id"""
-    return model.games[game_id]
+    return model.games.get(game_id,None)
 
 def player_dependency(
         session: model.Session = fastapi.Depends(session_dependency),
         game: model.Game = fastapi.Depends(game_dependency),
     ):
     """Dependency that returns the player from the player_id"""
+    if game is None:
+        return None
+    
     if session.id not in game.players:
         game.add_new_player(session)
     return game.players[session.id]

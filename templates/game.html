@@ -4,9 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Don't Be Odd</title>
+
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 </head>
 <body>
     <h1>Don't Be Odd</h1>
+    <input id="player_name" value="Loading..." onchange="updatePlayerName(this)">
     <p>Session Id: {{ session_id }}</p>
     <p>Player: {{ player }}</p>
     <h2>Playing Game: {{ game_id }}</h2>
@@ -15,6 +18,21 @@
 
 <script>
     
+    function updatePlayerName(element) {
+        var player_name = element.value;
+        console.log('Updating player name to:', player_name);
+        axios.post('/game/{{game_id}}/update_player_name/', {
+            name: player_name
+        })
+        .then(function(response) {
+            console.log('Player name updated:', response.data);
+        })
+        .catch(function(error) {
+            console.error('Error updating player name:', error);
+        });
+    }
+
+
     const socket = new WebSocket('/websocket/{{game_id}}');
 
     socket.onopen = function(event) {
