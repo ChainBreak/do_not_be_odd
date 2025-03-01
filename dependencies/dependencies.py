@@ -16,11 +16,14 @@ def model_dependency() -> model.Model:
 def session_dependency(
         request: fastapi.Request, 
         model: model.Model = fastapi.Depends(model_dependency),
-    ):
+    ) -> str:
     """Dependency that returns the user from the cookie"""
-    state_session_id = request.state.session_id 
+    session_id = request.state.session_id 
+
+    if session_id not in model.sessions:
+        raise fastapi.HTTPException(status_code=401, detail="Invalid session_id")
     
-    return model.sessions[state_session_id]
+    return session_id
 
 def game_dependency(
         game_id: str,
@@ -30,13 +33,11 @@ def game_dependency(
     return model.games.get(game_id,None)
 
 def player_dependency(
-        session: model.Session = fastapi.Depends(session_dependency),
+        session_id: str = fastapi.Depends(session_dependency),
         game: model.Game = fastapi.Depends(game_dependency),
     ):
     """Dependency that returns the player from the player_id"""
     if game is None:
         return None
     
-    if session.id not in game.players:
-        game.add_new_player(session)
-    return game.players[session.id]
+    return game.get_or_add_new_player(session_id)

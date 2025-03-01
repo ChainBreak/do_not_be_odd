@@ -4,26 +4,26 @@ import random
 import uuid
 from loguru import logger
 from models.game import Game
-from models.session import Session
+
 
 class Model():
 
     def __init__(self):
 
         logger.info("Creating new model")
-        self.sessions = {}
+        self.sessions = set()
         self.games = {}
     
     def add_new_session(self):
 
-        session = Session(
-            id=str( uuid.uuid4() ),
-        )
 
-        self.sessions[session.id] = session
+        session_id=str( uuid.uuid4() ),
 
-        logger.info(f"Created new session with id {session.id}")
-        return session
+
+        self.sessions.add(session_id)
+
+        logger.info(f"Created new session with id {session_id}")
+        return session_id
 
     def create_new_game(self) -> "Game":
         

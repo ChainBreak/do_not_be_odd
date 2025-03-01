@@ -1,8 +1,9 @@
 import dataclasses
-from models import session, game
+from models import game
 
 @dataclasses.dataclass
 class Player():
-    session: session.Session
+    session_id: str
     game: "game.Game"
     name: str = "Player"
+    playing: bool = False

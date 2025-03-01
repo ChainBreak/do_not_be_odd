@@ -26,7 +26,7 @@ async def root(
 async def play(
     request: Request,
     game_id: str,
-    session: str = Depends(deps.session_dependency),
+    session_id: str = Depends(deps.session_dependency),
     game: game.Game = Depends(deps.game_dependency),
     player: player.Player = Depends(deps.player_dependency),
     ):
@@ -45,7 +45,7 @@ async def play(
         context={
             "request": request,
             "game_id": game.id,
-            "session_id":session.id,
+            "session_id":session_id,
             "player": str(player),
         },
     )

@@ -22,8 +22,8 @@ async def add_session_id_cookie(request: Request, call_next):
     session_id = request.cookies.get("session_id", None)
     
     if session_id not in model.sessions:
-        session = model.add_new_session()
-        session_id = session.id
+        session_id = model.add_new_session()
+
 
     request.state.session_id = session_id
 
