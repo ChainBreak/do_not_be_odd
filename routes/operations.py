@@ -4,7 +4,7 @@ from fastapi.responses import RedirectResponse
 from fastapi import APIRouter, Request, Depends, Response
 from pydantic import BaseModel
 
-from models import model, game
+from models import model, game, player
 from fastapi import WebSocket
 
 import dependencies.dependencies as deps
@@ -42,7 +42,7 @@ class UpdatePlayerNameSchema(BaseModel):
 @router.post("/game/{game_id}/update_player_name")
 async def update_player_name(
     data: UpdatePlayerNameSchema,
-    player: game.Player = Depends(deps.player_dependency),
+    player: player.Player = Depends(deps.player_dependency),
     ):
 
     player.name = data.name

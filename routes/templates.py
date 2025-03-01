@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, Request, Response
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
-from models import model, game
+from models import model, game, player
 
 
 
@@ -27,8 +27,8 @@ async def play(
     request: Request,
     game_id: str,
     session: str = Depends(deps.session_dependency),
-    game: model.Game = Depends(deps.game_dependency),
-    player: game.Player = Depends(deps.player_dependency),
+    game: game.Game = Depends(deps.game_dependency),
+    player: player.Player = Depends(deps.player_dependency),
     ):
     
     if game is None:
