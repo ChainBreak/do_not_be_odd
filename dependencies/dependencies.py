@@ -40,4 +40,4 @@ def player_dependency(
     if game is None:
         return None
     
-    return game.get_or_add_new_player(session_id)
+    return game.add_or_get_player(session_id)
