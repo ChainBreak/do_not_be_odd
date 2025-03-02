@@ -2,7 +2,6 @@ import fastapi
 from fastapi.staticfiles import StaticFiles
 from fastapi import Request, Response
 import routes.templates
-import routes.websockets
 import routes.operations
 import dependencies.dependencies as deps
 from loguru import logger
@@ -11,7 +10,6 @@ app = fastapi.FastAPI()
 
 # app.mount("/static", StaticFiles(directory="static"), name="static")
 app.include_router(routes.templates.router)
-app.include_router(routes.websockets.router)
 app.include_router(routes.operations.router)
 
 @app.middleware("http")

@@ -33,29 +33,17 @@
     }
 
 
-    const socket = new WebSocket('/websocket/{{game_id}}');
+    setInterval(poll_for_game_state, 1000); // poll
 
-    socket.onopen = function(event) {
-        console.log('WebSocket is open now.');
-    };
-
-    socket.onmessage = function(event) {
-        console.log('WebSocket message received:', event.data);
-    };
-
-    socket.onclose = function(event) {
-        console.log('WebSocket is closed now.');
-    };
-
-    socket.onerror = function(error) {
-        console.error('WebSocket error observed:', error);
-    };
-
-    setInterval(function() {
-        if (socket.readyState === WebSocket.OPEN) {
-            socket.send('Hello, WebSocket!');
-        }
-    }, 5000); // Send a message every 5 seconds
+    function poll_for_game_state() {
+        axios.get('/game/{{game_id}}/state')
+        .then(function(response) {
+            console.log('Game state:', response.data);
+        })
+        .catch(function(error) {
+            console.error('Error getting game state:', error);
+        });
+    }
 </script>
 
 </html></html>

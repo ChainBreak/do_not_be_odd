@@ -1,11 +1,12 @@
 from typing import Optional
 from loguru import logger
 from fastapi.responses import RedirectResponse
-from fastapi import APIRouter, Request, Depends, Response
+from fastapi import APIRouter, Depends
 from pydantic import BaseModel
 
+
 from models import model, game, player
-from fastapi import WebSocket
+from schemas import game_schema
 
 import dependencies.dependencies as deps
 
@@ -48,3 +49,13 @@ async def update_player_name(
     player.name = data.name
 
     return {"message": "Player name updated"}
+
+@router.get("/game/{game_id}/state")
+async def get_game_state(
+    player: player.Player = Depends(deps.player_dependency),
+    game: game.Game = Depends(deps.game_dependency),
+    ) -> game_schema.GameSchema:
+
+    game.update()
+
+    return game_schema.GameSchema(game=game, player=player)

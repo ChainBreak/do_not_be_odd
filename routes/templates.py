@@ -13,11 +13,11 @@ router = APIRouter()
 @router.get("/", response_class=HTMLResponse)
 async def root(
     request: Request,
-    session: str = Depends(deps.session_dependency),
+    session_id: str = Depends(deps.session_dependency),
     ):
     response = templates.TemplateResponse(
         name="index.html",
-        context={"request": request, "session_id":session.id},
+        context={"request": request, "session_id":session_id},
     )
 
     return response

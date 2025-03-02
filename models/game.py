@@ -18,7 +18,7 @@ class Game():
             "round_end": self.state_round_end,
         }
         self.last_state = None
-        self.current_state = "waiting_for_players"
+        self.current_state = "join_round"
         self.next_state = self.current_state
 
     def add_or_get_player(self, session_id: str) -> "player.Player":
@@ -31,7 +31,7 @@ class Game():
         return self.players[session_id]
     
     def update(self):
-        current_state_callable = self.game_states[self.change_state]
+        current_state_callable = self.game_states[self.current_state]
         current_state_callable()
         self.last_state = self.current_state
         self.current_state = self.next_state

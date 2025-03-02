@@ -16,9 +16,7 @@ class Model():
     
     def add_new_session(self):
 
-
-        session_id=str( uuid.uuid4() ),
-
+        session_id=str( uuid.uuid4() )
 
         self.sessions.add(session_id)
 
