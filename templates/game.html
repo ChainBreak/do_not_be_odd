@@ -13,15 +13,32 @@
         <h1>Don't Be Odd</h1>
         <input v-model.lazy="player_name" v-on:change="updatePlayerName()" placeholder="Enter your name">
         <p>Session Id: {{ session_id }}</p>
-        <p>Player: {{ player }}</p>
         <h2>Playing Game: {{ game_id }}</h2>
-        <p>Enjoy playing</p>
         {% raw %}
-        <p>{{ player_name  }}</p>
+
+        <p>{{ current_state }}</p>
 
         <li v-for="player in player_list" :key="player.id">
             {{ player.name }}
         </li>
+
+        <div v-if="current_state === 'join_round'">
+            <p>Round starting...</p>
+            <p>Waiting for players to join...</p>
+        </div>
+        <div v-else-if="current_state === 'round_start'">
+            <p>Get Ready! Its starting</p>
+        </div>
+        <div v-else-if="current_state === 'player_turn'">
+            <p>It's your turn!</p>
+        </div>
+        <div v-else-if="current_state === 'show_result'">
+            <p>Look where everyone clicked</p>
+        </div>
+        <div v-else-if="current_state === 'round_end'">
+            <p>Here is the odd list</p>
+        </div>
+
 
         {% endraw %}
     </div>
@@ -30,45 +47,53 @@
 <script type="module">
     const { createApp, ref } = Vue;
 
-    function setup(){
-        // special vue setup function
-        const player_name = ref("");
-        const player_list = ref([]);
+    // Vue reactive state
+    const current_state = ref("");
+    const player_name = ref("");
+    const player_list = ref([]);
+    
+    // Polling for game state
+    const interval = setInterval(poll_for_game_state, 1000);
+    
+    poll_for_game_state();
+    function poll_for_game_state() {
+        axios.get('/game/{{game_id}}/state')
+        .then(update_page_from_game_state)
+        .catch(function(error) {
+            console.error('Error getting game state:', error);
+        });
+    }
+    
+    function update_page_from_game_state(response) {
+        var game_state = response.data;
+        console.log('Game state:', game_state);
+
+        // Populate player_name if it's empty
+        if (player_name.value === ""){
+            player_name.value = game_state.player_name;
+        }
         
-        const interval = setInterval(poll_for_game_state, 1000); // poll
-
-        function poll_for_game_state() {
-            axios.get('/game/{{game_id}}/state')
-            .then(update_page_from_game_state)
-            .catch(function(error) {
-                console.error('Error getting game state:', error);
-            });
-        }
-        poll_for_game_state();
-
-        function update_page_from_game_state(response) {
-            console.log('Game state:', response.data);
-            if (player_name.value === ""){
-                    player_name.value = response.data.player_name;
-                }
-
-            player_list.value = response.data.player_list;
-        }
-
-        function updatePlayerName() {
-            console.log('Updating player name to:', player_name);
-            axios.post('/game/{{game_id}}/update_player_name/', {
-                name: player_name.value
-            })
-            .then(function(response) {
-                console.log('Player name updated:', response.data);
-            })
-            .catch(function(error) {
-                console.error('Error updating player name:', error);
-            });
-        }
-
+        // Update list of players
+        player_list.value = game_state.player_list;
+        current_state.value = game_state.current_state;
+    }
+    
+    function updatePlayerName() {
+        console.log('Updating player name to:', player_name);
+        axios.post('/game/{{game_id}}/update_player_name/', {
+            name: player_name.value
+        })
+        .then(function(response) {
+            console.log('Player name updated:', response.data);
+        })
+        .catch(function(error) {
+            console.error('Error updating player name:', error);
+        });
+    }
+    
+    function setup(){
         return {
+            current_state,
             player_name,
             player_list,
             interval,

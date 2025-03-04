@@ -13,8 +13,8 @@ class Game():
         self.game_states = {
             "join_round": self.state_join_round,
             "round_start": self.state_round_start,
-            "answer_task": self.state_answer_task,
-            "task_result": self.state_task_result,
+            "player_turn": self.state_player_turn,
+            "show_result": self.state_show_result,
             "round_end": self.state_round_end,
         }
         self.last_state = None
@@ -33,6 +33,8 @@ class Game():
     def update(self):
         current_state_callable = self.game_states[self.current_state]
         current_state_callable()
+        if self.is_state_first_call():
+            logger.info(f"Game {self.id} changed state from {self.last_state} to {self.current_state}")
         self.last_state = self.current_state
         self.current_state = self.next_state
 
@@ -48,16 +50,38 @@ class Game():
         self.next_state = new_state
 
     def state_join_round(self):
-        pass
+        if self.is_state_first_call():
+            self.start_time = self.time_function()
+        
+        if self.time_function() - self.start_time > 3:
+            self.change_state("round_start")
 
     def state_round_start(self):
-        pass
-    def state_answer_task(self):
-        pass
-    def state_task_result(self):
-        pass
+        if self.is_state_first_call():
+            self.start_time = self.time_function()
+        
+        if self.time_function() - self.start_time > 3:
+            self.change_state("player_turn")
+
+    def state_player_turn(self):
+        if self.is_state_first_call():
+            self.start_time = self.time_function()
+        
+        if self.time_function() - self.start_time > 3:
+            self.change_state("show_result")
+    def state_show_result(self):
+        if self.is_state_first_call():
+            self.start_time = self.time_function()
+        
+        if self.time_function() - self.start_time > 3:
+            self.change_state("round_end")
+
     def state_round_end(self):
-        pass
+        if self.is_state_first_call():
+            self.start_time = self.time_function()
+        
+        if self.time_function() - self.start_time > 3:
+            self.change_state("round_start")
 
 class GameRound():
     def __init__(self):

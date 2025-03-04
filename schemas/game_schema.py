@@ -3,6 +3,7 @@ from models import game, player
 
 class GameSchema(BaseModel):
     game_id: str
+    current_state: str
     player_name: str
     num_players: int
     player_list: list["PlayerSchema"]
@@ -10,6 +11,7 @@ class GameSchema(BaseModel):
     def __init__(self,game: game.Game, player: player.Player):
         super().__init__(
             game_id = game.id,
+            current_state = game.current_state,
             player_name = player.name,
             num_players = len(game.players),
             player_list = [PlayerSchema(player) for player in game.players.values()],
