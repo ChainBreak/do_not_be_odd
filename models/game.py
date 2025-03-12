@@ -81,7 +81,7 @@ class Game():
             self.start_time = self.time_function()
         
         if self.time_function() - self.start_time > 3:
-            self.change_state("round_start")
+            self.change_state("join_round")
 
 class GameRound():
     def __init__(self):

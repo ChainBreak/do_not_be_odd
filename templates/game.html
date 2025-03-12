@@ -12,7 +12,7 @@
 </head>
 <body class="w3-theme">
     <div id="vue_app">
-        
+
         <!-- Top Bar -->
         <div class="w3-container w3-theme-d3 w3-xlarge">
             <div class="w3-left w3-padding-16 w3-margin-left">Don't Be Odd - {{game_id}}</div>
@@ -29,15 +29,24 @@
         {% raw %}
         <div class="w3-cell-row" >
             
-        
+            <!-- Left Container Unused -->
             <div class="w3-container w3-cell" style="width:20%">
               <p>Unused left panel</p>
             </div>
-          
+            
+            <!-- Center contrainer Game Screens-->
             <div class="w3-container  w3-cell w3-center">
+
+                <!-- Padding -->
+                <div class="w3-container w3-center" style="height:100px"></div>
+
                 <div v-if="current_state === 'join_round'">
-                    <p>Round starting...</p>
-                    <p>Waiting for players to join...</p>
+                    <h2>Round {{round_number}}</h2>
+                    <p v-if="playing_this_round">You have joined!</p>
+                    <p v-if="!playing_this_round">You are currently spectating!</p>
+                    <button class="w3-button w3-green" v-on:click="join_round()" v-bind:disabled="playing_this_round">Join</button>
+                    <button class="w3-button w3-blue" v-on:click="spectate_round()" v-bind:disabled="!playing_this_round">Spectate</button>
+
                 </div>
                 <div v-else-if="current_state === 'round_start'">
                     <p>Get Ready! Its starting</p>
@@ -51,8 +60,10 @@
                 <div v-else-if="current_state === 'round_end'">
                     <p>Here is the odd list</p>
                 </div>
+                <p>{{ current_url }}</p>
             </div>
 
+            <!-- Right containter players -->
             <div class="w3-container  w3-cell" style="width:20%">
                 <h4>Players</h4>
                 <ul class="w3-ul">
@@ -75,7 +86,10 @@
     const current_state = ref("");
     const player_name = ref("");
     const player_list = ref([]);
-    
+    const round_number = ref(1);
+    const playing_this_round = ref(false);
+    const current_url = ref(""); 
+
     // Polling for game state
     const interval = setInterval(poll_for_game_state, 1000);
     
@@ -100,6 +114,7 @@
         // Update list of players
         player_list.value = game_state.player_list;
         current_state.value = game_state.current_state;
+        // current_state.value = "join_round";
     }
     
     function updatePlayerName() {
@@ -114,28 +129,36 @@
             console.error('Error updating player name:', error);
         });
     }
+
+    function join_round() {
+        playing_this_round.value = true;
+    }
+    function spectate_round() {
+        playing_this_round.value = false;
+    }
     
     function setup(){
         return {
             current_state,
             player_name,
             player_list,
+            round_number,
+            playing_this_round,
+            current_url, 
             interval,
             updatePlayerName,
+            join_round,
+            spectate_round,
         };
     }
 
     function mounted() {
         console.log('Vue app mounted');
+        current_url.value = window.location.href; 
     }
 
-    var vue_app = createApp({setup, mounted})
-    console.log('Vue app:', vue_app);
+    var vue_app = createApp({setup, mounted});
     vue_app.mount("#vue_app");
-    
-
-
-
 </script>
 
-</html></html>
+</html>
