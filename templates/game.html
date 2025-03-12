@@ -12,20 +12,24 @@
 </head>
 <body class="w3-theme">
     <div id="vue_app">
+        
         <!-- Top Bar -->
-        <div class="w3-theme-d3 w3-xlarge" style="margin:auto">
-            <div class="w3-left w3-padding-16 w3-margin-left">Don't Be Odd</div>
+        <div class="w3-container w3-theme-d3 w3-xlarge">
+            <div class="w3-left w3-padding-16 w3-margin-left">Don't Be Odd - {{game_id}}</div>
             <input 
                 class="w3-right w3-padding-16 w3-margin-right w3-right-align " 
                 v-model.lazy="player_name" 
                 v-on:change="updatePlayerName()" 
                 style="border: none; outline: none; background-color: inherit; color: inherit;">
-            <div class="w3-center w3-padding-16 w3-center-align">{{game_id}}</div>
+            <div class="w3-center w3-padding-16 w3-center-align"></div>
         </div>
+
+
 
         {% raw %}
         <div class="w3-cell-row" >
-
+            
+        
             <div class="w3-container w3-cell" style="width:20%">
               <p>Unused left panel</p>
             </div>
