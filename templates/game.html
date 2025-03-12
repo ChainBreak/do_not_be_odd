@@ -16,17 +16,17 @@
         <!-- Top Bar -->
         <div class="w3-container w3-theme-d3 w3-xlarge">
             <div class="w3-left w3-padding-16 w3-margin-left">Don't Be Odd - {{game_id}}</div>
+            {% raw %}
             <input 
                 class="w3-right w3-padding-16 w3-margin-right w3-right-align " 
                 v-model.lazy="player_name" 
-                v-on:change="updatePlayerName()" 
+                v-on:change="send_event('update_player_name', {name: $event.target.value});" 
                 style="border: none; outline: none; background-color: inherit; color: inherit;">
-            <div class="w3-center w3-padding-16 w3-center-align"></div>
         </div>
 
 
 
-        {% raw %}
+        
         <div class="w3-cell-row" >
             
             <!-- Left Container Unused -->
@@ -44,9 +44,10 @@
                     <h2>Round {{round_number}}</h2>
                     <p v-if="playing_this_round">You have joined!</p>
                     <p v-if="!playing_this_round">You are currently spectating!</p>
-                    <button class="w3-button w3-green" v-on:click="join_round()" v-bind:disabled="playing_this_round">Join</button>
-                    <button class="w3-button w3-blue" v-on:click="spectate_round()" v-bind:disabled="!playing_this_round">Spectate</button>
-
+                    <button class="w3-button w3-green" v-on:click="send_event('join_round')" v-bind:disabled="playing_this_round">Join</button>
+                    <button class="w3-button w3-blue" v-on:click="send_event('spectate_round')" v-bind:disabled="!playing_this_round">Spectate</button>
+                    <br></br>
+                    <button class="w3-button w3-yellow" v-on:click="send_event('hurry_up')" v-bind:disabled="!playing_this_round">Hurry Up!</button>
                 </div>
                 <div v-else-if="current_state === 'round_start'">
                     <p>Get Ready! Its starting</p>
@@ -104,39 +105,36 @@
     
     function update_page_from_game_state(response) {
         var game_state = response.data;
+        var player = game_state.this_player;
         console.log('Game state:', game_state);
 
         // Populate player_name if it's empty
         if (player_name.value === ""){
-            player_name.value = game_state.player_name;
+            player_name.value = player.name;
         }
         
-        // Update list of players
         player_list.value = game_state.player_list;
         current_state.value = game_state.current_state;
-        // current_state.value = "join_round";
+        current_state.value = "join_round";
+        playing_this_round.value = player.playing_this_round;
     }
     
-    function updatePlayerName() {
-        console.log('Updating player name to:', player_name);
-        axios.post('/game/{{game_id}}/update_player_name/', {
-            name: player_name.value
+
+    function send_event(event_id, payload={}){
+        console.log('Sending Event:', event_id, payload);
+        axios.post('/game/{{game_id}}/event', {
+            id: event_id,
+            payload: payload
         })
         .then(function(response) {
-            console.log('Player name updated:', response.data);
+            console.log('Event Response:', response.data);
+            poll_for_game_state();
         })
         .catch(function(error) {
-            console.error('Error updating player name:', error);
+            console.error('Error sending event:', error);
         });
     }
 
-    function join_round() {
-        playing_this_round.value = true;
-    }
-    function spectate_round() {
-        playing_this_round.value = false;
-    }
-    
     function setup(){
         return {
             current_state,
@@ -146,9 +144,7 @@
             playing_this_round,
             current_url, 
             interval,
-            updatePlayerName,
-            join_round,
-            spectate_round,
+            send_event,
         };
     }
 

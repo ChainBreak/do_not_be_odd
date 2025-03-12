@@ -37,18 +37,34 @@ async def update_user(
 def read_item(item_id: int, q: Optional[str] = None):
     return {"item_id": item_id, "q": q}
 
-class UpdatePlayerNameSchema(BaseModel):
-    name: str
 
-@router.post("/game/{game_id}/update_player_name")
-async def update_player_name(
-    data: UpdatePlayerNameSchema,
+class EventSchema(BaseModel):
+    id: str
+    payload: dict
+
+@router.post("/game/{game_id}/event")
+async def game_event(
+    event: EventSchema,
     player: player.Player = Depends(deps.player_dependency),
+    game: game.Game = Depends(deps.game_dependency),
     ):
 
-    player.name = data.name
+    match event.id:
 
-    return {"message": "Player name updated"}
+        case "update_player_name":
+            player.name = event.payload["name"]
+            return {"message": "Player name updated"}
+        
+        case "join_round":
+            player.playing = True
+            logger.info(f"Player Joined {player.playing}")
+            return {"message": "Player joined round"}
+        
+        case "spectate_round":
+            player.playing = False
+            logger.info(f"Player Joined {player.playing}")
+            return {"message": "Player left round"}
+
 
 @router.get("/game/{game_id}/state")
 async def get_game_state(
