@@ -9,7 +9,7 @@ class Player():
         self.session_id = session_id
         self.game = game
         self.id = str(uuid.uuid4())
-        self.name = codename.codename()
+        self.name = codename.codename(capitalize=True, separator="_")
     
     def playing_this_round(self) -> bool:
         return self in self.game.get_current_round().players

@@ -47,7 +47,7 @@
                     <button class="w3-button w3-green" v-on:click="send_event('join_round')" v-bind:disabled="playing_this_round">Join</button>
                     <button class="w3-button w3-blue" v-on:click="send_event('spectate_round')" v-bind:disabled="!playing_this_round">Spectate</button>
                     <br></br>
-                    <button class="w3-button w3-yellow" v-on:click="send_event('hurry_up')" v-bind:disabled="!playing_this_round">Hurry Up!</button>
+                    <button class="w3-button w3-green" v-on:click="send_event('start_round')" v-bind:disabled="!playing_this_round">Start Round</button>
                 </div>
                 <div v-else-if="current_state === 'round_start'">
                     <p>Get Ready! Its starting</p>
@@ -61,6 +61,7 @@
                 <div v-else-if="current_state === 'round_end'">
                     <p>Here is the odd list</p>
                 </div>
+                <p>Invite Others!</p>
                 <p>{{ current_url }}</p>
             </div>
 
@@ -69,7 +70,7 @@
                 <h4>Players</h4>
                 <ul class="w3-ul">
                     <li v-for="player in player_list" :key="player.id">
-                        ⏳✅ 👀{{ player.name }}
+                        <span v-if="!player.playing_this_round">👀</span> {{ player.name }}
                     </li>
                 </ul>
             </div>
