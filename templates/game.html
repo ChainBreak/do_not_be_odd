@@ -119,13 +119,9 @@
         playing_this_round.value = player.playing_this_round;
     }
     
-
-    function send_event(event_id, payload={}){
-        console.log('Sending Event:', event_id, payload);
-        axios.post('/game/{{game_id}}/event', {
-            id: event_id,
-            payload: payload
-        })
+    function send_event(game_endpoint, payload={}){
+        console.log('Sending Event:', game_endpoint, payload);
+        axios.post('/game/{{game_id}}/' + game_endpoint, payload)
         .then(function(response) {
             console.log('Event Response:', response.data);
             poll_for_game_state();
