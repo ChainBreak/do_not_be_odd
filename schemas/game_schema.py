@@ -26,6 +26,6 @@ class PlayerSchema(BaseModel):
         super().__init__(
             name=player.name,
             id=player.id,
-            playing_this_round=player.playing,
+            playing_this_round=player.playing_this_round(),
         )
 

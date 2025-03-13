@@ -32,14 +32,16 @@ async def get_game_state(
 @router.post("/game/{game_id}/join_round")
 async def join_round(
     player: player.Player = Depends(deps.player_dependency),
+    game: game.Game = Depends(deps.game_dependency),
     ):
-    player.playing = True
+    game.add_player_to_round(player)
 
 @router.post("/game/{game_id}/spectate_round")
 async def spectate_round(
     player: player.Player = Depends(deps.player_dependency),
+    game: game.Game = Depends(deps.game_dependency),
     ):
-    player.playing = False
+    game.remove_player_from_round(player)
 
 
 class UpdatePlayerNameSchema(BaseModel):

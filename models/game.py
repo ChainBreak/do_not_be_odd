@@ -29,6 +29,20 @@ class Game():
             logger.info(f"Added player {new_player} to game {self.id}")
 
         return self.players[session_id]
+
+    def add_player_to_round(self, player: player.Player):
+        round = self.get_current_round()
+        round.players.add(player)
+
+    def remove_player_from_round(self, player: player.Player):
+        round = self.get_current_round()
+        try:
+            round.players.remove(player)
+        except KeyError:
+            pass
+
+    def get_current_round(self) -> "GameRound":
+        return self.rounds[-1]
     
     def update(self):
         current_state_callable = self.game_states[self.current_state]
