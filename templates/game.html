@@ -60,7 +60,7 @@
                 <div v-else-if="current_state === 'click_image'">
                     <h2>Click a spot in the image</h2>
                     <div class="w3-container">
-                        <img src="https://picsum.photos/640/480" style="width:100%">
+                        <img v-bind:src="image_url" v-bind:key="image_url" style="width:100%">
                     </div>
                 </div>
 
@@ -106,6 +106,7 @@
     const player_ready = ref(false);
     const current_url = ref(""); 
     const response_msg = ref("");
+    const image_url = ref("");
 
     // Polling for game state
     const interval = setInterval(poll_for_game_state, 1000);
@@ -136,6 +137,7 @@
         playing_this_round.value = player.playing_this_round;
         player_ready.value = player.ready;
         round_number.value = game_state.round_number;
+        image_url.value = game_state.image_url;
     }
 
     function update_players_with_status_icons(player_list){
@@ -172,6 +174,7 @@
             current_url, 
             interval,
             response_msg,
+            image_url,
             send_event,
         };
     }

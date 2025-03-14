@@ -8,6 +8,7 @@ class GameSchema(BaseModel):
     num_players: int
     player_list: list["PlayerSchema"]
     round_number: int
+    image_url: str
 
     def __init__(self,game: game.Game, player: player.Player):
         super().__init__(
@@ -17,6 +18,7 @@ class GameSchema(BaseModel):
             this_player = PlayerSchema(player),
             num_players = len(game.players),
             player_list = [PlayerSchema(other_player) for other_player in game.players.values()],
+            image_url = game.image.url,
         )
 
 class PlayerSchema(BaseModel):

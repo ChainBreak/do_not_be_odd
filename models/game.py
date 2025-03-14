@@ -2,16 +2,23 @@
 import time
 from loguru import logger
 from models import player
+from itertools import cycle
 
 class Game():
-    def __init__(self, game_id: str, time_function: callable = time.time):
+    def __init__(self, 
+            game_id: str, 
+            time_function: callable = time.time
+            ):
         self.id:str = game_id
         self.time_function = time_function
         self.players: dict[str,player.Player] = dict()
         self.round_players: set[player.Player] = set()
         self.ready_players: set[player.Player] = set()
         self.round_number: int = 1
-
+        self.image_generator = image_generator()
+        self.image: Image = next(self.image_generator)
+        self.round_image_count: int = 0
+        self.round_max_images: int = 5
     
         self.game_states = {
             "join_round": self.state_join_round,
@@ -89,22 +96,29 @@ class Game():
     def state_round_start(self):
         if self.is_state_first_call():
             self.start_time = self.time_function()
+            self.round_image_count = 0
         
         if self.time_function() - self.start_time > 3:
             self.change_state("click_image")
 
     def state_click_image(self):
         if self.is_state_first_call():
+            self.image = next(self.image_generator)
             self.start_time = self.time_function()
-        
+            self.round_image_count += 1
+
         if self.time_function() - self.start_time > 10:
             self.change_state("show_result")
+
     def state_show_result(self):
         if self.is_state_first_call():
             self.start_time = self.time_function()
         
         if self.time_function() - self.start_time > 3:
-            self.change_state("round_end")
+            if self.round_image_count < self.round_max_images:
+                self.change_state("click_image")
+            else:
+                self.change_state("round_end")
 
     def state_round_end(self):
         if self.is_state_first_call():
@@ -112,4 +126,27 @@ class Game():
         
         if self.time_function() - self.start_time > 3:
             self.change_state("join_round")
+
+class Image():
+    def __init__(self, url: str):
+        self.url = url
+        self.player_clicks = dict()
+
+def image_generator():
+    for url in cycle(IMAGE_LIST):
+        yield Image(url)
+    
+IMAGE_LIST=[
+    "https://picsum.photos/id/0/640/480",
+    "https://picsum.photos/id/7/640/480",
+    "https://picsum.photos/id/9/640/480",
+    "https://picsum.photos/id/20/640/480",
+    "https://picsum.photos/id/26/640/480",
+    "https://picsum.photos/id/31/640/480",
+    "https://picsum.photos/id/50/640/480",
+    "https://picsum.photos/id/49/640/480",
+    "https://picsum.photos/id/64/640/480",
+    "https://picsum.photos/id/85/640/480",
+    "https://picsum.photos/id/193/640/480",
+]    
 
