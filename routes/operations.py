@@ -34,15 +34,24 @@ async def join_round(
     player: player.Player = Depends(deps.player_dependency),
     game: game.Game = Depends(deps.game_dependency),
     ):
-    game.add_player_to_round(player)
+    response_msg = game.add_player_to_round(player)
+    return response_msg
 
 @router.post("/game/{game_id}/spectate_round")
 async def spectate_round(
     player: player.Player = Depends(deps.player_dependency),
     game: game.Game = Depends(deps.game_dependency),
     ):
-    game.remove_player_from_round(player)
+    response_msg = game.remove_player_from_round(player)
+    return response_msg
 
+@router.post("/game/{game_id}/start_round")
+async def spectate_round(
+    player: player.Player = Depends(deps.player_dependency),
+    game: game.Game = Depends(deps.game_dependency),
+    ):
+    response_msg = game.vote_to_start_round(player)
+    return response_msg
 
 class UpdatePlayerNameSchema(BaseModel):
     name: str
@@ -53,3 +62,4 @@ async def update_player_name(
     player: player.Player = Depends(deps.player_dependency),
     ):
     player.name = payload.name
+    return "Name Updated"

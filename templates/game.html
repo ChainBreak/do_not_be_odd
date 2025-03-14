@@ -24,13 +24,11 @@
                 style="border: none; outline: none; background-color: inherit; color: inherit;">
         </div>
 
-
-
-        
+        <!-- Main Game Area -->
         <div class="w3-cell-row" >
             
             <!-- Left Container Unused -->
-            <div class="w3-container w3-cell" style="width:20%">
+            <div class="w3-container w3-cell" style="width:25%">
               <p>Unused left panel</p>
             </div>
             
@@ -47,36 +45,50 @@
                     <button class="w3-button w3-green" v-on:click="send_event('join_round')" v-bind:disabled="playing_this_round">Join</button>
                     <button class="w3-button w3-blue" v-on:click="send_event('spectate_round')" v-bind:disabled="!playing_this_round">Spectate</button>
                     <br></br>
-                    <button class="w3-button w3-green" v-on:click="send_event('start_round')" v-bind:disabled="!playing_this_round">Start Round</button>
+                    <button class="w3-button w3-green" v-on:click="send_event('start_round')" v-bind:disabled="!playing_this_round | player_ready">Start Round</button>
+                    <p>Invite Others!</p>
+                    <p>{{ current_url }}</p>
                 </div>
+
                 <div v-else-if="current_state === 'round_start'">
-                    <p>Get Ready! Its starting</p>
+                    <h2>Round {{round_number}} Starting</h2>
+                    <p>Click a spot in the image.</p>
+                    <p>Just click the same spot as everyone else.</p>
                 </div>
+
                 <div v-else-if="current_state === 'player_turn'">
-                    <p>It's your turn!</p>
+                    <h2>Click a spot in the image</h2>
+                    <div class="w3-container">
+                        <img src="https://picsum.photos/640/480" style="width:100%">
+                    </div>
                 </div>
+
                 <div v-else-if="current_state === 'show_result'">
                     <p>Look where everyone clicked</p>
                 </div>
                 <div v-else-if="current_state === 'round_end'">
                     <p>Here is the odd list</p>
                 </div>
-                <p>Invite Others!</p>
-                <p>{{ current_url }}</p>
+                
             </div>
 
             <!-- Right containter players -->
-            <div class="w3-container  w3-cell" style="width:20%">
+            <div class="w3-container  w3-cell" style="width:25%">
                 <h4>Players</h4>
-                <ul class="w3-ul">
-                    <li v-for="player in player_list" :key="player.id">
-                        <span v-if="!player.playing_this_round">👀</span> {{ player.name }}
+                <ul class="w3-ul" style="border: none;">
+                    <li v-for="player in player_list" :key="player.id"
+                        class="w3-padding-small"
+                        style="border: none;">
+                        {{ player.status_icon }} {{ player.name }}
                     </li>
                 </ul>
             </div>
           
         </div>
-
+        <!-- Footer -->
+        <div class="w3-container w3-theme-d3 w3-bottom w3-center">
+            <p>{{ response_msg }}</p>
+        </div>
         {% endraw %}
     </div>
 </body>
@@ -90,7 +102,9 @@
     const player_list = ref([]);
     const round_number = ref(1);
     const playing_this_round = ref(false);
+    const player_ready = ref(false);
     const current_url = ref(""); 
+    const response_msg = ref("");
 
     // Polling for game state
     const interval = setInterval(poll_for_game_state, 1000);
@@ -103,28 +117,42 @@
             console.error('Error getting game state:', error);
         });
     }
-    
+    // Main update function
     function update_page_from_game_state(response) {
         var game_state = response.data;
         var player = game_state.this_player;
-        console.log('Game state:', game_state);
 
         // Populate player_name if it's empty
         if (player_name.value === ""){
             player_name.value = player.name;
         }
-        
+
+        // Give each player a status icon
+        update_players_with_status_icons(game_state.player_list)
+
         player_list.value = game_state.player_list;
         current_state.value = game_state.current_state;
-        current_state.value = "join_round";
         playing_this_round.value = player.playing_this_round;
+        player_ready.value = player.ready;
+        round_number.value = game_state.round_number;
+    }
+
+    function update_players_with_status_icons(player_list){
+        player_list.forEach(player => {
+            if (player.playing_this_round){
+                player.status_icon = player.ready ? "✅" : "⏳";
+            } else {
+                player.status_icon = "👀";
+            }
+        });
+        return player_list;
     }
     
     function send_event(game_endpoint, payload={}){
         console.log('Sending Event:', game_endpoint, payload);
         axios.post('/game/{{game_id}}/' + game_endpoint, payload)
         .then(function(response) {
-            console.log('Event Response:', response.data);
+            response_msg.value = response.data;
             poll_for_game_state();
         })
         .catch(function(error) {
@@ -139,8 +167,10 @@
             player_list,
             round_number,
             playing_this_round,
+            player_ready,
             current_url, 
             interval,
+            response_msg,
             send_event,
         };
     }

@@ -8,7 +8,7 @@ class Game():
         self.id:str = game_id
         self.time_function = time_function
         self.players: dict[str,player.Player] = dict()
-        self.rounds = [GameRound()]
+        self.rounds = []
     
         self.game_states = {
             "join_round": self.state_join_round,
@@ -31,15 +31,29 @@ class Game():
         return self.players[session_id]
 
     def add_player_to_round(self, player: player.Player):
+        if self.current_state != "join_round":
+            return "Can't Join! Round already started"
+        
         round = self.get_current_round()
         round.players.add(player)
+        return "Joined Round"
 
     def remove_player_from_round(self, player: player.Player):
-        round = self.get_current_round()
+        current_round = self.get_current_round()
         try:
-            round.players.remove(player)
+            current_round.players.remove(player)
         except KeyError:
             pass
+        return "Player Removed"
+    
+    def vote_to_start_round(self, player: player.Player):
+        if self.current_state != "join_round":
+            return "Round already started"
+        
+        current_round = self.get_current_round()
+        current_round.ready_players.add(player)
+        return "Round Start Requested"
+        
 
     def get_current_round(self) -> "GameRound":
         return self.rounds[-1]
@@ -65,9 +79,12 @@ class Game():
 
     def state_join_round(self):
         if self.is_state_first_call():
-            self.start_time = self.time_function()
+            self.rounds.append(GameRound())
         
-        if self.time_function() - self.start_time > 3:
+        current_round = self.get_current_round()
+        if (len(current_round.players) > 1
+            and current_round.ready_players == current_round.players
+        ):
             self.change_state("round_start")
 
     def state_round_start(self):
@@ -81,7 +98,7 @@ class Game():
         if self.is_state_first_call():
             self.start_time = self.time_function()
         
-        if self.time_function() - self.start_time > 3:
+        if self.time_function() - self.start_time > 10:
             self.change_state("show_result")
     def state_show_result(self):
         if self.is_state_first_call():
@@ -102,3 +119,4 @@ class GameRound():
         self.num_tasks_in_round = 10
         self.current_task = 0
         self.players = set()
+        self.ready_players = set()

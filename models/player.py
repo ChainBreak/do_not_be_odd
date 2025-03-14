@@ -13,3 +13,6 @@ class Player():
     
     def playing_this_round(self) -> bool:
         return self in self.game.get_current_round().players
+    
+    def is_ready(self) -> bool:
+        return self in self.game.get_current_round().ready_players

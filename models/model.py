@@ -1,5 +1,4 @@
 from collections import defaultdict
-import dataclasses
 import random
 import uuid
 from loguru import logger
@@ -13,6 +12,10 @@ class Model():
         logger.info("Creating new model")
         self.sessions = set()
         self.games = {}
+
+        self.games["TEST"] = Game(
+            game_id="TEST",
+        )
     
     def add_new_session(self):
 
