@@ -8,7 +8,10 @@ class Game():
         self.id:str = game_id
         self.time_function = time_function
         self.players: dict[str,player.Player] = dict()
-        self.rounds = []
+        self.round_players: set[player.Player] = set()
+        self.ready_players: set[player.Player] = set()
+        self.round_number: int = 1
+
     
         self.game_states = {
             "join_round": self.state_join_round,
@@ -34,29 +37,25 @@ class Game():
         if self.current_state != "join_round":
             return "Can't Join! Round already started"
         
-        round = self.get_current_round()
-        round.players.add(player)
+        self.round_players.add(player)
         return "Joined Round"
 
     def remove_player_from_round(self, player: player.Player):
-        current_round = self.get_current_round()
-        try:
-            current_round.players.remove(player)
-        except KeyError:
-            pass
+        if player in self.round_players:
+            self.round_players.remove(player)
+
+        if player in self.ready_players:
+            self.ready_players.remove(player)
+
         return "Player Removed"
     
     def vote_to_start_round(self, player: player.Player):
         if self.current_state != "join_round":
             return "Round already started"
         
-        current_round = self.get_current_round()
-        current_round.ready_players.add(player)
+        self.ready_players.add(player)
         return "Round Start Requested"
         
-
-    def get_current_round(self) -> "GameRound":
-        return self.rounds[-1]
     
     def update(self):
         current_state_callable = self.game_states[self.current_state]
@@ -79,13 +78,16 @@ class Game():
 
     def state_join_round(self):
         if self.is_state_first_call():
-            self.rounds.append(GameRound())
+            self.round_players.clear()
+            self.ready_players.clear()
         
-        current_round = self.get_current_round()
-        if (len(current_round.players) > 1
-            and current_round.ready_players == current_round.players
+        if (
+            len(self.round_players) > 1 # More than one player
+            and self.round_players.issubset(self.ready_players) # Round players are subset of ready players
         ):
             self.change_state("round_start")
+
+        print(self.round_players, self.ready_players)
 
     def state_round_start(self):
         if self.is_state_first_call():
@@ -114,9 +116,3 @@ class Game():
         if self.time_function() - self.start_time > 3:
             self.change_state("join_round")
 
-class GameRound():
-    def __init__(self):
-        self.num_tasks_in_round = 10
-        self.current_task = 0
-        self.players = set()
-        self.ready_players = set()

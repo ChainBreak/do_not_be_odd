@@ -12,7 +12,7 @@ class Player():
         self.name = codename.codename(capitalize=True, separator="_")
     
     def playing_this_round(self) -> bool:
-        return self in self.game.get_current_round().players
+        return self in self.game.round_players
     
     def is_ready(self) -> bool:
-        return self in self.game.get_current_round().ready_players
+        return self in self.game.ready_players

@@ -12,7 +12,7 @@ class GameSchema(BaseModel):
     def __init__(self,game: game.Game, player: player.Player):
         super().__init__(
             game_id = game.id,
-            round_number = len(game.rounds),
+            round_number = game.round_number,
             current_state = game.current_state,
             this_player = PlayerSchema(player),
             num_players = len(game.players),
