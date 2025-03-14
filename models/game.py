@@ -16,7 +16,7 @@ class Game():
         self.game_states = {
             "join_round": self.state_join_round,
             "round_start": self.state_round_start,
-            "player_turn": self.state_player_turn,
+            "click_image": self.state_click_image,
             "show_result": self.state_show_result,
             "round_end": self.state_round_end,
         }
@@ -52,11 +52,9 @@ class Game():
     def vote_to_start_round(self, player: player.Player):
         if self.current_state != "join_round":
             return "Round already started"
-        
         self.ready_players.add(player)
         return "Round Start Requested"
         
-    
     def update(self):
         current_state_callable = self.game_states[self.current_state]
         current_state_callable()
@@ -81,22 +79,21 @@ class Game():
             self.round_players.clear()
             self.ready_players.clear()
         
+        # Wait for all players to be ready
         if (
             len(self.round_players) > 1 # More than one player
             and self.round_players.issubset(self.ready_players) # Round players are subset of ready players
         ):
             self.change_state("round_start")
 
-        print(self.round_players, self.ready_players)
-
     def state_round_start(self):
         if self.is_state_first_call():
             self.start_time = self.time_function()
         
         if self.time_function() - self.start_time > 3:
-            self.change_state("player_turn")
+            self.change_state("click_image")
 
-    def state_player_turn(self):
+    def state_click_image(self):
         if self.is_state_first_call():
             self.start_time = self.time_function()
         
