@@ -14,7 +14,7 @@ class Game():
         self.players: dict[str,player.Player] = dict()
         self.round_players: set[player.Player] = set()
         self.ready_players: set[player.Player] = set()
-        self.round_number: int = 1
+        self.round_number: int = 0
         self.image_generator = image_generator()
         self.image: Image = next(self.image_generator)
         self.round_image_count: int = 0
@@ -85,6 +85,7 @@ class Game():
         if self.is_state_first_call():
             self.round_players.clear()
             self.ready_players.clear()
+            self.round_number += 1
         
         # Wait for all players to be ready
         if (
