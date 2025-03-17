@@ -63,12 +63,12 @@ class Game():
         return "Round Start Requested"
         
     def update(self):
+        self.current_state = self.next_state
         current_state_callable = self.game_states[self.current_state]
         current_state_callable()
         if self.is_state_first_call():
             logger.info(f"Game {self.id} changed state from {self.last_state} to {self.current_state}")
         self.last_state = self.current_state
-        self.current_state = self.next_state
 
     def is_state_first_call(self):
         return self.last_state != self.current_state
