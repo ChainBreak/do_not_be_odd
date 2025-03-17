@@ -58,14 +58,24 @@
                 </div>
 
                 <div v-else-if="current_state === 'click_image'">
-                    <h2>Click a spot in the image</h2>
+                    <p>Click a spot in the image</p>
                     <div class="w3-container">
-                        <img v-bind:src="image_url" v-bind:key="image_url" style="width:100%">
+                        <img 
+                            v-bind:src="image_url" 
+                            v-bind:key="image_url" 
+                            style="width:100%"
+                            v-on:click="send_player_click($event)" />
                     </div>
                 </div>
 
                 <div v-else-if="current_state === 'show_result'">
                     <p>Look where everyone clicked</p>
+                    <div class="w3-container">
+                        <img 
+                            v-bind:src="image_url" 
+                            v-bind:key="image_url" 
+                            style="width:100%"/>
+                    </div>
                 </div>
                 <div v-else-if="current_state === 'round_end'">
                     <p>Here is the odd list</p>
@@ -151,6 +161,18 @@
         return player_list;
     }
     
+    function send_player_click(event) {
+        const rect = event.target.getBoundingClientRect();
+        var x = event.clientX - rect.left;
+        var y = event.clientY - rect.top;
+
+        // Normalize x and y to be between 0 and 1
+        x = x / rect.width;
+        y = y / rect.height;
+
+        send_event('player_click', {x, y});
+    }
+    
     function send_event(game_endpoint, payload={}){
         console.log('Sending Event:', game_endpoint, payload);
         axios.post('/game/{{game_id}}/' + game_endpoint, payload)
@@ -176,6 +198,7 @@
             response_msg,
             image_url,
             send_event,
+            send_player_click,
         };
     }
 

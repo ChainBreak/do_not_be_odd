@@ -59,9 +59,24 @@ class Game():
     def vote_to_start_round(self, player: player.Player):
         if self.current_state != "join_round":
             return "Round already started"
-        self.ready_players.add(player)
+        self.set_player_ready(player)
         return "Round Start Requested"
+    
+    def player_clicked_image(self, player: player.Player, x: float, y: float):
+        if self.current_state != "click_image":
+            return "Can't Click! Not in click image state"
         
+        self.image.add_player_click(player, x, y)
+        self.set_player_ready(player)
+        return "Click Registered"
+    
+    def set_player_ready(self, player: player.Player):
+        self.ready_players.add(player)
+
+    def all_players_ready(self):
+        # All players are ready when round players are subset of ready players
+        return self.round_players.issubset(self.ready_players)
+
     def update(self):
         self.current_state = self.next_state
         current_state_callable = self.game_states[self.current_state]
@@ -90,7 +105,7 @@ class Game():
         # Wait for all players to be ready
         if (
             len(self.round_players) > 1 # More than one player
-            and self.round_players.issubset(self.ready_players) # Round players are subset of ready players
+            and self.all_players_ready() 
         ):
             self.change_state("round_start")
 
@@ -107,8 +122,9 @@ class Game():
             self.image = next(self.image_generator)
             self.start_time = self.time_function()
             self.round_image_count += 1
+            self.ready_players.clear()
 
-        if self.time_function() - self.start_time > 10:
+        if self.all_players_ready():
             self.change_state("show_result")
 
     def state_show_result(self):
@@ -132,6 +148,11 @@ class Image():
     def __init__(self, url: str):
         self.url = url
         self.player_clicks = dict()
+
+    def add_player_click(self, player: player.Player, x: float, y: float):
+        self.player_clicks[player] = (x,y)
+        for player, (x,y) in self.player_clicks.items():
+            print(f"Player {player.name} clicked at {x},{y}")
 
 def image_generator():
     for url in cycle(IMAGE_LIST):

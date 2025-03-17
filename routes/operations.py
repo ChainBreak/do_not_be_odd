@@ -63,3 +63,16 @@ async def update_player_name(
     ):
     player.name = payload.name
     return "Name Updated"
+
+class PlayerClickSchema(BaseModel):
+    x: float
+    y: float
+
+@router.post("/game/{game_id}/player_click")
+async def update_player_name(
+    payload : PlayerClickSchema,
+    player: player.Player = Depends(deps.player_dependency),
+    game: game.Game = Depends(deps.game_dependency),
+    ):
+
+    return game.player_clicked_image(player, payload.x, payload.y)
