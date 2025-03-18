@@ -24,6 +24,11 @@
                 v-on:change="send_event('update_player_name', {name: $event.target.value});" 
                 style="border: none; outline: none; background-color: inherit; color: inherit;">
         </div>
+        
+        
+        <div v-if="!playing_this_round" class="w3-container w3-blue w3-center">
+            <p>You are Spectating</p>
+        </div>
 
         <!-- Main Game Area -->
         <div class="w3-cell-row" >
@@ -42,7 +47,6 @@
                 <div v-if="current_state === 'join_round'">
                     <h2>Round {{round_number}}</h2>
                     <p v-if="playing_this_round">You have joined!</p>
-                    <p v-if="!playing_this_round">You are currently spectating!</p>
                     <button class="w3-button w3-green" v-on:click="send_event('join_round')" v-bind:disabled="playing_this_round">Join</button>
                     <button class="w3-button w3-blue" v-on:click="send_event('spectate_round')" v-bind:disabled="!playing_this_round">Spectate</button>
                     <br></br>
@@ -117,6 +121,7 @@
     const current_url = ref(""); 
     const response_msg = ref("");
     const image_url = ref("");
+    const click_point_list = ref([]);
 
     // Polling for game state
     const interval = setInterval(poll_for_game_state, 1000);
