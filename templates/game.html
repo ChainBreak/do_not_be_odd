@@ -63,7 +63,7 @@
 
                 <div v-else-if="current_state === 'click_image'">
                     <p>Click a spot in the image</p>
-                    <div class="w3-container">
+                    <div class="w3-container" style="padding: 0;">
                         <img 
                             v-bind:src="image_url" 
                             v-bind:key="image_url" 
@@ -74,7 +74,7 @@
 
                 <div v-else-if="current_state === 'show_result'">
                     <p>Look where everyone clicked</p>
-                    <div class="w3-container" style="position: relative;">
+                    <div class="w3-container" style="position: relative; padding: 0;">
                         <img 
                             v-bind:src="image_url" 
                             v-bind:key="image_url" 
