@@ -74,12 +74,30 @@
 
                 <div v-else-if="current_state === 'show_result'">
                     <p>Look where everyone clicked</p>
-                    <div class="w3-container">
+                    <div class="w3-container" style="position: relative;">
                         <img 
                             v-bind:src="image_url" 
                             v-bind:key="image_url" 
                             style="width:100%"/>
+                            
+                        <!-- Draw points on the image as divs with rounded edges -->
+                        <div 
+                            v-for="(pt, index) in click_points" 
+                            v-bind:key="index"
+                            style="position:absolute; 
+                                   background:hsl(346, 63%, 52%); 
+                                   border: 1px solid black;
+                                   border-radius:50%; 
+                                   width:10px; 
+                                   height:10px; 
+                                   transform: translate(-50%, -50%);"
+                            v-bind:style="{ 
+                                left: (pt.x * 100) + '%', 
+                                top: (pt.y * 100) + '%'
+                            }">
+                        </div>
                     </div>
+                    <button class="w3-button w3-green" v-on:click="send_event('start_round')">Done</button>
                 </div>
                 <div v-else-if="current_state === 'round_end'">
                     <p>Here is the odd list</p>
@@ -121,7 +139,11 @@
     const current_url = ref(""); 
     const response_msg = ref("");
     const image_url = ref("");
-    const click_point_list = ref([]);
+    const click_points = ref([
+        {x: 0.5, y: 0.5},
+        {x: 0.25, y: 0.25},
+        {x: 0.75, y: 0.75},
+    ]);
 
     // Polling for game state
     const interval = setInterval(poll_for_game_state, 1000);
@@ -153,6 +175,7 @@
         player_ready.value = player.ready;
         round_number.value = game_state.round_number;
         image_url.value = game_state.image_url;
+        click_points.value = game_state.click_points;
     }
 
     function update_players_with_status_icons(player_list){
@@ -179,6 +202,7 @@
     }
     
     function send_event(game_endpoint, payload={}){
+        // Send an event to the game and show the response message
         console.log('Sending Event:', game_endpoint, payload);
         axios.post('/game/{{game_id}}/' + game_endpoint, payload)
         .then(function(response) {
@@ -202,6 +226,7 @@
             interval,
             response_msg,
             image_url,
+            click_points,
             send_event,
             send_player_click,
         };
