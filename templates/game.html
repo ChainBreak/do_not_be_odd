@@ -35,7 +35,6 @@
             
             <!-- Left Container Unused -->
             <div class="w3-container w3-cell" style="width:25%">
-              <p>Unused left panel</p>
             </div>
             
             <!-- Center contrainer Game Screens-->
@@ -50,7 +49,7 @@
                     <button class="w3-button w3-green" v-on:click="send_event('join_round')" v-bind:disabled="playing_this_round">Join</button>
                     <button class="w3-button w3-blue" v-on:click="send_event('spectate_round')" v-bind:disabled="!playing_this_round">Spectate</button>
                     <br></br>
-                    <button class="w3-button w3-green" v-on:click="send_event('start_round')" v-bind:disabled="!playing_this_round | player_ready">Start Round</button>
+                    <button class="w3-button w3-green" v-on:click="send_event('player_ready')" v-bind:disabled="!playing_this_round | player_ready">Start Round</button>
                     <p>Invite Others!</p>
                     <p>{{ current_url }}</p>
                 </div>
@@ -85,7 +84,7 @@
                             v-for="(pt, index) in click_points" 
                             v-bind:key="index"
                             style="position:absolute; 
-                                   background:hsl(346, 63%, 52%); 
+                                   background:hsl(135, 48%, 44%); 
                                    border: 1px solid black;
                                    border-radius:50%; 
                                    width:10px; 
@@ -97,7 +96,7 @@
                             }">
                         </div>
                     </div>
-                    <button class="w3-button w3-green" v-on:click="send_event('start_round')">Done</button>
+                    <button class="w3-button w3-green" v-on:click="send_event('player_ready')" v-bind:disabled="player_ready">Done</button>
                 </div>
                 <div v-else-if="current_state === 'round_end'">
                     <p>Here is the odd list</p>

@@ -55,13 +55,7 @@ class Game():
             self.ready_players.remove(player)
 
         return "Player Removed"
-    
-    def vote_to_start_round(self, player: player.Player):
-        if self.current_state != "join_round":
-            return "Round already started"
-        self.set_player_ready(player)
-        return "Round Start Requested"
-    
+
     def player_clicked_image(self, player: player.Player, x: float, y: float):
         if self.current_state != "click_image":
             return "Can't Click! Not in click image state"
@@ -114,7 +108,7 @@ class Game():
             self.start_time = self.time_function()
             self.round_image_count = 0
         
-        if self.time_function() - self.start_time > 3:
+        if self.time_function() - self.start_time > 6:
             self.change_state("click_image")
 
     def state_click_image(self):
@@ -129,9 +123,9 @@ class Game():
 
     def state_show_result(self):
         if self.is_state_first_call():
-            self.start_time = self.time_function()
+            self.ready_players.clear()
         
-        if self.time_function() - self.start_time > 3:
+        if self.all_players_ready():
             if self.round_image_count < self.round_max_images:
                 self.change_state("click_image")
             else:

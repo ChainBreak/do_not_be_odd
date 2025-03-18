@@ -45,13 +45,13 @@ async def spectate_round(
     response_msg = game.remove_player_from_round(player)
     return response_msg
 
-@router.post("/game/{game_id}/start_round")
+@router.post("/game/{game_id}/player_ready")
 async def spectate_round(
     player: player.Player = Depends(deps.player_dependency),
     game: game.Game = Depends(deps.game_dependency),
     ):
-    response_msg = game.vote_to_start_round(player)
-    return response_msg
+    game.set_player_ready(player)
+    return "Player Ready!"
 
 class UpdatePlayerNameSchema(BaseModel):
     name: str
